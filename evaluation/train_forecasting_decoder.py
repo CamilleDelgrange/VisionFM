@@ -151,17 +151,17 @@ def train(model, linear_classifier, optimizer, loader, epoch, n, avgpool, pos_we
 		delta_time = delta_time.cuda(non_blocking=True)
 
 		# forward
-		 with torch.no_grad():
-			 intermediate_output = model.get_intermediate_layers(inp, n)
-			 if avgpool == 0:
-				 output = [x[:, 0] for x in intermediate_output] # each one [B, dim]
-			 elif avgpool == 1:
-				 output = [torch.mean(intermediate_output[-1][:, 1:], dim=1)]
-			 elif avgpool == 2:
-				 output = [x[:, 0] for x in intermediate_output] + [torch.mean(intermediate_output[-1][:, 1:], dim=1)]
-			 else:
-				 assert False, "Unkown avgpool type {}".format(avgpool)
-			 input_feats = torch.cat(output, dim=-1)
+		with torch.no_grad():
+			intermediate_output = model.get_intermediate_layers(inp, n)
+			if avgpool == 0:
+				output = [x[:, 0] for x in intermediate_output] # each one [B, dim]
+			elif avgpool == 1:
+				output = [torch.mean(intermediate_output[-1][:, 1:], dim=1)]
+			elif avgpool == 2:
+				output = [x[:, 0] for x in intermediate_output] + [torch.mean(intermediate_output[-1][:, 1:], dim=1)]
+			else:
+				assert False, "Unkown avgpool type {}".format(avgpool)
+			input_feats = torch.cat(output, dim=-1)
 
 		output = linear_classifier(input_feats, delta_time)
 		# compute the loss
